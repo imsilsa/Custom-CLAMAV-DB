@@ -1,0 +1,741 @@
+
+zextras@mail:~/conf$ cat freshclam.conf.in
+##
+## Example config file for freshclam
+## Please read the freshclam.conf(5) manual before editing this file.
+##
+
+
+# Comment or remove the line below.
+#Example
+
+# Path to the database directory.
+# WARNING: It must match clamd.conf's directive!
+# Default: hardcoded (depends on installation options)
+DatabaseDirectory /opt/zextras/data/clamav/db
+
+# Path to the log file (make sure it has proper permissions)
+# Default: disabled
+UpdateLogFile /opt/zextras/log/freshclam.log
+
+# Maximum size of the log file.
+# Value of 0 disables the limit.
+# You may use 'M' or 'm' for megabytes (1M = 1m = 1048576 bytes)
+# and 'K' or 'k' for kilobytes (1K = 1k = 1024 bytes).
+# in bytes just don't use modifiers. If LogFileMaxSize is enabled,
+# log rotation (the LogRotate option) will always be enabled.
+# Default: 1M
+#LogFileMaxSize 2M
+
+# Log time with each message.
+# Default: no
+#LogTime yes
+
+# Enable verbose logging.
+# Default: no
+#LogVerbose yes
+
+# Use system logger (can work together with UpdateLogFile).
+# Default: no
+#LogSyslog yes
+
+# Specify the type of syslog messages - please refer to 'man syslog'
+# for facility names.
+# Default: LOG_LOCAL6
+#LogFacility LOG_MAIL
+
+# Enable log rotation. Always enabled when LogFileMaxSize is enabled.
+# Default: no
+#LogRotate yes
+
+# This option allows you to save the process identifier of the daemon
+# This file will be owned by root, as long as freshclam was started by root.
+# It is recommended that the directory where this file is stored is
+# also owned by root to keep other users from tampering with it.
+# Default: disabled
+PidFile /opt/zextras/log/freshclam.pid
+
+# By default when started freshclam drops privileges and switches to the
+# "clamav" user. This directive allows you to change the database owner.
+# Default: clamav (may depend on installation options)
+DatabaseOwner zextras
+
+# Use DNS to verify virus database version. FreshClam uses DNS TXT records
+# to verify database and software versions. With this directive you can change
+# the database verification domain.
+# WARNING: Do not touch it unless you're configuring freshclam to use your
+# own database verification domain.
+# Default: current.cvd.clamav.net
+#DNSDatabaseInfo current.cvd.clamav.net
+
+# Uncomment the following line and replace XY with your country
+# code. See http://www.iana.org/cctld/cctld-whois.htm for the full list.
+# You can use db.XY.ipv6.clamav.net for IPv6 connections.
+%%explode DatabaseMirror VAR:zimbraClamAVDatabaseMirror%%
+
+# How many attempts to make before giving up.
+# Default: 3 (per mirror)
+#MaxAttempts 5
+
+# With this option you can control scripted updates. It's highly recommended
+# to keep it enabled.
+# Default: yes
+#ScriptedUpdates yes
+
+# By default freshclam will keep the local databases (.cld) uncompressed to
+# make their handling faster. With this option you can enable the compression;
+# the change will take effect with the next database update.
+# Default: no
+#CompressLocalDatabase no
+
+# With this option you can provide custom sources for database files.
+# This option can be used multiple times. Support for:
+#   http(s)://, ftp(s)://, or file://
+# Default: no custom URLs
+#DatabaseCustomURL http://myserver.example.com/mysigs.ndb
+#DatabaseCustomURL https://myserver.example.com/mysigs.ndb
+#DatabaseCustomURL https://myserver.example.com:4567/allow_list.wdb
+#DatabaseCustomURL ftp://myserver.example.com/example.ldb
+#DatabaseCustomURL ftps://myserver.example.com:4567/example.ndb
+#DatabaseCustomURL file:///mnt/nfs/local.hdb
+
+#Malware_Expert
+DatabaseCustomURL http://www.rfxn.com/downloads/rfxn.ndb
+DatabaseCustomURL http://www.rfxn.com/downloads/rfxn.hdb
+DatabaseCustomURL http://www.rfxn.com/downloads/rfxn.yara
+
+# bofhland
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_cracked_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_malware_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_phishing_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_malware_attach.hdb
+
+
+# Porcupine
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/porcupine.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/phishtank.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/porcupine.hsb
+
+%%explode DatabaseCustomURL VAR:carbonioClamAVDatabaseCustomURL%%
+
+# This option allows you to easily point freshclam to private mirrors.
+# If PrivateMirror is set, freshclam does not attempt to use DNS
+# to determine whether its databases are out-of-date, instead it will
+# use the If-Modified-Since request or directly check the headers of the
+# remote database files. For each database, freshclam first attempts
+# to download the CLD file. If that fails, it tries to download the
+# CVD file. This option overrides DatabaseMirror, DNSDatabaseInfo
+# and ScriptedUpdates. It can be used multiple times to provide
+# fall-back mirrors.
+# Default: disabled
+#PrivateMirror mirror1.example.com
+#PrivateMirror mirror2.example.com
+
+# Number of database checks per day.
+# Default: 12 (every two hours)
+Checks %%freq VAR:zimbraVirusDefinitionsUpdateFrequency 24%%
+
+# Proxy settings
+# The HTTPProxyServer may be prefixed with [scheme]:// to specify which kind
+# of proxy is used.
+#   http://     HTTP Proxy. Default when no scheme or proxy type is specified.
+#   https://    HTTPS Proxy. (Added in 7.52.0 for OpenSSL, GnuTLS and NSS)
+#   socks4://   SOCKS4 Proxy.
+#   socks4a://  SOCKS4a Proxy. Proxy resolves URL hostname.
+#   socks5://   SOCKS5 Proxy.
+#   socks5h://  SOCKS5 Proxy. Proxy resolves URL hostname.
+# Default: disabled
+#HTTPProxyServer https://proxy.example.com
+#HTTPProxyPort 1234
+#HTTPProxyUsername myusername
+#HTTPProxyPassword mypass
+
+# If your servers are behind a firewall/proxy which applies User-Agent
+# filtering you can use this option to force the use of a different
+# User-Agent header.
+# As of ClamAV 0.103.3, this setting may not be used when updating from the
+# clamav.net CDN and can only be used when updating from a private mirror.
+# Default: clamav/version_number (OS: ..., ARCH: ..., CPU: ..., UUID: ...)
+#HTTPUserAgent SomeUserAgentIdString
+
+# Use aaa.bbb.ccc.ddd as client address for downloading databases. Useful for
+# multi-homed systems.
+# Default: Use OS'es default outgoing IP address.
+#LocalIPAddress aaa.bbb.ccc.ddd
+
+# Send the RELOAD command to clamd.
+# Default: no
+NotifyClamd /opt/zextras/conf/clamd.conf
+
+# Run command after successful database update.
+# Use EXIT_1 to return 1 after successful database update.
+# Default: disabled
+#OnUpdateExecute command
+
+# Run command when database update process fails.
+# Default: disabled
+#OnErrorExecute command
+
+# Run command when freshclam reports outdated version.
+# In the command string %v will be replaced by the new version number.
+# Default: disabled
+#OnOutdatedExecute command
+
+# Don't fork into background.
+# Default: no
+#Foreground yes
+
+# Enable debug messages in libclamav.
+# Default: no
+#Debug yes
+
+# Timeout in seconds when connecting to database server.
+# Default: 30
+#ConnectTimeout 60
+
+# Maximum time in seconds for each download operation. 0 means no timeout.
+# Default: 0
+#ReceiveTimeout 1800
+
+# With this option enabled, freshclam will attempt to load new databases into
+# memory to make sure they are properly handled by libclamav before replacing
+# the old ones.
+# Tip: This feature uses a lot of RAM. If your system has limited RAM and you
+# are actively running ClamD or ClamScan during the update, then you may need
+# to set `TestDatabases no`.
+# Default: yes
+#TestDatabases no
+
+# This option enables downloading of bytecode.cvd, which includes additional
+# detection mechanisms and improvements to the ClamAV engine.
+# Default: yes
+#Bytecode no
+
+# Include an optional signature databases (opt-in).
+# This option can be used multiple times.
+#ExtraDatabase dbname1
+#ExtraDatabase dbname2
+
+# Exclude a standard signature database (opt-out).
+# This option can be used multiple times.
+#ExcludeDatabase dbname1
+#ExcludeDatabase dbname2
+zextras@mail:~/conf$
+
+
+
+
+zextras@mail:~/conf$ tail  -n 100 /opt/zextras/log/freshclam.log
+bofhland_phishing_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_attach.hdb is up-to-date (version: custom database)
+porcupine.ndb is up-to-date (version: custom database)
+phishtank.ndb is up-to-date (version: custom database)
+porcupine.hsb is up-to-date (version: custom database)
+--------------------------------------
+Received signal: wake up
+ClamAV update process started at Fri Jul  7 02:55:50 2023
+daily.cld database is up-to-date (version: 26961, sigs: 2038526, f-level: 90, builder: raynman)
+main.cvd database is up-to-date (version: 62, sigs: 6647427, f-level: 90, builder: sigmgr)
+bytecode.cvd database is up-to-date (version: 334, sigs: 91, f-level: 90, builder: anvilleg)
+rfxn.ndb is up-to-date (version: custom database)
+rfxn.hdb is up-to-date (version: custom database)
+rfxn.yara is up-to-date (version: custom database)
+bofhland_cracked_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_URL.ndb is up-to-date (version: custom database)
+bofhland_phishing_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_attach.hdb is up-to-date (version: custom database)
+porcupine.ndb is up-to-date (version: custom database)
+phishtank.ndb is up-to-date (version: custom database)
+porcupine.hsb is up-to-date (version: custom database)
+--------------------------------------
+Received signal: wake up
+ClamAV update process started at Fri Jul  7 04:55:56 2023
+daily.cld database is up-to-date (version: 26961, sigs: 2038526, f-level: 90, builder: raynman)
+main.cvd database is up-to-date (version: 62, sigs: 6647427, f-level: 90, builder: sigmgr)
+bytecode.cvd database is up-to-date (version: 334, sigs: 91, f-level: 90, builder: anvilleg)
+rfxn.ndb is up-to-date (version: custom database)
+rfxn.hdb is up-to-date (version: custom database)
+rfxn.yara is up-to-date (version: custom database)
+bofhland_cracked_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_URL.ndb is up-to-date (version: custom database)
+bofhland_phishing_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_attach.hdb is up-to-date (version: custom database)
+Testing database: '/opt/zextras/data/clamav/db/tmp.7de2f15f18/clamav-3d0350d9093fc19c13502c4c0f4de690.tmp-porcupine.ndb' ...
+Database test passed.
+porcupine.ndb updated (version: custom database, sigs: 2567)
+Testing database: '/opt/zextras/data/clamav/db/tmp.7de2f15f18/clamav-295681c656b82d655b94de4492bb7a3f.tmp-phishtank.ndb' ...
+Database test passed.
+phishtank.ndb updated (version: custom database, sigs: 1)
+Testing database: '/opt/zextras/data/clamav/db/tmp.7de2f15f18/clamav-ca900f360bf48e98cdb082995cb60f57.tmp-porcupine.hsb' ...
+Database test passed.
+porcupine.hsb updated (version: custom database, sigs: 250)
+WARNING: Clamd was NOT notified: Can't connect to clamd through /opt/zextras/data/clamav/clamav.sock: Connection refused
+--------------------------------------
+Received signal: wake up
+ClamAV update process started at Fri Jul  7 06:56:03 2023
+daily.cld database is up-to-date (version: 26961, sigs: 2038526, f-level: 90, builder: raynman)
+main.cvd database is up-to-date (version: 62, sigs: 6647427, f-level: 90, builder: sigmgr)
+bytecode.cvd database is up-to-date (version: 334, sigs: 91, f-level: 90, builder: anvilleg)
+rfxn.ndb is up-to-date (version: custom database)
+rfxn.hdb is up-to-date (version: custom database)
+rfxn.yara is up-to-date (version: custom database)
+bofhland_cracked_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_URL.ndb is up-to-date (version: custom database)
+bofhland_phishing_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_attach.hdb is up-to-date (version: custom database)
+porcupine.ndb is up-to-date (version: custom database)
+phishtank.ndb is up-to-date (version: custom database)
+porcupine.hsb is up-to-date (version: custom database)
+--------------------------------------
+Received signal: wake up
+ClamAV update process started at Fri Jul  7 08:56:09 2023
+daily.cld database is up-to-date (version: 26961, sigs: 2038526, f-level: 90, builder: raynman)
+main.cvd database is up-to-date (version: 62, sigs: 6647427, f-level: 90, builder: sigmgr)
+bytecode.cvd database is up-to-date (version: 334, sigs: 91, f-level: 90, builder: anvilleg)
+rfxn.ndb is up-to-date (version: custom database)
+rfxn.hdb is up-to-date (version: custom database)
+rfxn.yara is up-to-date (version: custom database)
+bofhland_cracked_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_URL.ndb is up-to-date (version: custom database)
+bofhland_phishing_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_attach.hdb is up-to-date (version: custom database)
+Testing database: '/opt/zextras/data/clamav/db/tmp.7de2f15f18/clamav-4f2677f25e7787b10c4948e3298aafbc.tmp-porcupine.ndb' ...
+Database test passed.
+porcupine.ndb updated (version: custom database, sigs: 2567)
+Testing database: '/opt/zextras/data/clamav/db/tmp.7de2f15f18/clamav-b569328a022257393f2c7af9cd04ceed.tmp-phishtank.ndb' ...
+Database test passed.
+phishtank.ndb updated (version: custom database, sigs: 1)
+Testing database: '/opt/zextras/data/clamav/db/tmp.7de2f15f18/clamav-49ffc7852ef14ffdc977ba499085ad0f.tmp-porcupine.hsb' ...
+Database test passed.
+porcupine.hsb updated (version: custom database, sigs: 250)
+WARNING: Clamd was NOT notified: Can't connect to clamd through /opt/zextras/data/clamav/clamav.sock: Connection refused
+--------------------------------------
+Received signal: wake up
+ClamAV update process started at Fri Jul  7 10:56:16 2023
+daily.cld database is up-to-date (version: 26961, sigs: 2038526, f-level: 90, builder: raynman)
+main.cvd database is up-to-date (version: 62, sigs: 6647427, f-level: 90, builder: sigmgr)
+bytecode.cvd database is up-to-date (version: 334, sigs: 91, f-level: 90, builder: anvilleg)
+rfxn.ndb is up-to-date (version: custom database)
+rfxn.hdb is up-to-date (version: custom database)
+rfxn.yara is up-to-date (version: custom database)
+bofhland_cracked_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_URL.ndb is up-to-date (version: custom database)
+bofhland_phishing_URL.ndb is up-to-date (version: custom database)
+bofhland_malware_attach.hdb is up-to-date (version: custom database)
+porcupine.ndb is up-to-date (version: custom database)
+phishtank.ndb is up-to-date (version: custom database)
+porcupine.hsb is up-to-date (version: custom database)
+--------------------------------------
+zextras@mail:~/conf$
+
+
+
+
+zextras@mail:~/conf$ zmfreshclamctl restart
+Stopping freshclam...done.
+Starting freshclam...done.
+zextras@mail:~/conf$
+zextras@mail:~/conf$ zmcontrol restart
+Host mail.sampleserver.xyz
+        Stopping config service...Done.
+        Stopping service webapp...Done.
+        Stopping stats...Done.
+        Stopping mta...Done.
+        Stopping cbpolicyd...Done.
+        Stopping opendkim...Done.
+        Stopping amavis...Done.
+        Stopping antivirus...Done.
+        Stopping antispam...Done.
+        Stopping proxy...Done.
+        Stopping memcached...Done.
+        Stopping mailbox...Done.
+        Stopping directory-server...Done.
+Host mail.sampleserver.xyz
+        Starting directory server...Done.
+        Starting config service...Done.
+        Starting mailbox...Done.
+        Starting memcached...Done.
+        Starting proxy...Done.
+        Starting amavis...Done.
+        Starting antispam...Done.
+        Starting antivirus...Done.
+        Starting opendkim...Done.
+        Starting mta...Done.
+        Starting stats...Done.
+        Starting service webapp...Done.
+zextras@mail:~/conf$
+
+
+
+
+# Maleware-rfxn
+DatabaseCustomURL http://www.rfxn.com/downloads/rfxn.ndb
+DatabaseCustomURL http://www.rfxn.com/downloads/rfxn.hdb
+DatabaseCustomURL http://www.rfxn.com/downloads/rfxn.yara
+
+# Custom Database Clamav With token (register for free https://www.securiteinfo.com/clients/customers/account ) 
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/securiteinfo.hdb
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/securiteinfo.ign2
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/javascript.ndb
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/spam_marketing.ndb
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/securiteinfohtml.hdb
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/securiteinfoascii.hdb
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/securiteinfoandroid.hdb
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/securiteinfoold.hdb
+DatabaseCustomURL https://www.securiteinfo.com/get/signatures/7e7af83dd8eb714f77d6ddb08932b66c5e3779c805e52dec70df86995c55e040e5ebe37b01edb1bfcf538bf39e3e0d61dfd5f2b086694fae2866500a37a504be/securiteinfopdf.hdb
+
+# Malware
+DatabaseCustomURL https://cdn.malware.expert/malware.expert.ndb
+DatabaseCustomURL https://cdn.malware.expert/malware.expert.hdb
+DatabaseCustomURL https://cdn.malware.expert/malware.expert.ldb
+DatabaseCustomURL https://cdn.malware.expert/malware.expert.fp
+
+# Sanesecurity + Foxhole
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/MiscreantPunch099-INFO-Low.ldb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/MiscreantPunch099-Low.ldb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/Sanesecurity_BlackEnergy.yara
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/Sanesecurity_sigtest.yara
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/Sanesecurity_spam.yara
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/badmacro.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/blurl.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_cracked_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_malware_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_malware_attach.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_phishing_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/crdfam.clamav.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/doppelstern-phishtank.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/doppelstern.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/doppelstern.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/foxhole_all.cdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/foxhole_all.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/foxhole_filename.cdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/foxhole_generic.cdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/foxhole_js.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/foxhole_mail.cdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/hackingteam.hsb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/junk.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/jurlbl.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/jurlbla.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/lott.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/malwarehash.hsb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/phish.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/rogue.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/scam.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/scamnailer.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/shelter.ldb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/sigwhitelist.ign2
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/spam.ldb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/spamattach.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/spamimg.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/spear.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/spearl.ndb
+
+# winnow
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow.attachments.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow.complex.patterns.ldb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow_bad_cw.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow_extended_malware.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow_extended_malware_links.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow_malware.hdb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow_phish_complete.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow_phish_complete_url.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/winnow_spam_complete.ndb
+
+# bofhland
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_cracked_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_malware_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_phishing_URL.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/bofhland_malware_attach.hdb
+
+
+# Porcupine
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/porcupine.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/phishtank.ndb
+DatabaseCustomURL https://ftp.swin.edu.au/sanesecurity/porcupine.hsb
+
+# maldet
+DatabaseCustomURL https://www.rfxn.com/downloads/rfxn.ndb
+DatabaseCustomURL https://www.rfxn.com/downloads/rfxn.hdb
+
+# Githubusercontent
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_PCclient.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Passcv.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Pipcreat.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Poseidon_Group.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Prikormka.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_PutterPanda.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_RedLeaves.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Regin.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Sauron_extras.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Scarab_Scieron.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Seaduke.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Snowglobe_Babar.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Sofacy_Bundestag.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Sofacy_Fysbis.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Sofacy_Jun16.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Sphinx_Moth.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Stuxnet.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Terracota.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_ThreatGroup3390.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_TradeSecret.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Turla_Neuron.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_UP007_SLServer.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Unit78020.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Waterbug.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_WildNeutron.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Windigo_Onimiki.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_Winnti.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_WoolenGoldfish.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_eqgrp_apr17.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_fancybear_dnc.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_fancybear_downdelph.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/APT_furtim.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/EXPERIMENTAL_Beef.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/GEN_PowerShell.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_ATMPot.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_ATM_HelloWorld.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_AgentTesla.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_AgentTesla_SMTP.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Alina.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Andromeda.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Arkei.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Athena.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Atmos.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_BackdoorSSH.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Backoff.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Bangat.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_BlackRev.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_BlackWorm.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Boouset.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Bublik.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Buzus_Softpulse.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_CAP_HookExKeylogger.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Chicken.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Citadel.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Cloaking.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Cookies.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Cxpid.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Cythosia.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_DDoSTf.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Derkziel.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Dexter.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_DiamondFox.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_DirtJumper.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Eicar.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Emotet.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Empire.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Exploit_UAC_Elevators.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Ezcob.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_F0xy.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_FALLCHILL.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_FUDCrypt.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_FakeM.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Fareit.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Favorite.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Gafgyt.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Genome.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Gozi.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Grozlex.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Hsdfihdf_banking.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Intel_Virtualization.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_IotReaper.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Jolob_Backdoor.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_KINS.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Kelihos.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_KeyBase.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Korlia.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Korplug.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Kovter.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Kraken.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Kwampirs.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Lateral_Movement.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Lenovo_Superfish.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_LinuxBew.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_LinuxHelios.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_LinuxMoose.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_LostDoor.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_LuaBot.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_MSILStealer.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_MacGyver.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Madness.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Magento_backend.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Magento_frontend.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Magento_suspicious.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Mailers.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_MedusaHTTP_2019.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Miancha.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_MiniAsp3_mem.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Miscelanea_Linux.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Monero_Miner_installer.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_NionSpy.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Notepad.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_OSX_Leverage.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_PittyTiger.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_PolishBankRat.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Ponmocup.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Pony.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Predator.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_PurpleWave.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_PyPI.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Retefe.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Rockloader.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Rovnix.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Sakurel.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Sayad.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Sendsafe.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Shamoon.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Shifu.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Skeleton.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Spora.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Sqlite.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Stealer.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Tedroo.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Tinba.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_TreasureHunt.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_TrickBot.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Trumpbot.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Upatre.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Urausy.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Virut_FileInfector_UNK_VERSION.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Volgmer.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Wabot.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_XHide.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_XMRIG_Miner.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_XOR_DDos.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Yayih.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Yordanyan_ActiveAgent.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Zegost.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_Zeus.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_adwind_RAT.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_hancitor.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_kirbi_mimikatz.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_kpot.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_marap.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_shifu_shiz.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_sitrof_fortis_scar.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/MALW_viotto_keylogger.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/Operation_Blockbuster/PapaAlfa.yara
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/Operation_Blockbuster/RomeoEcho.yara
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/Operation_Blockbuster/TangoAlfa.yara
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/Operation_Blockbuster/UniformJuliett.yara
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/Operation_Blockbuster/cert_wiper.yara
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/Operation_Blockbuster/general.yara
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/Operation_Blockbuster/suicidescripts.yara
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/POS.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/POS_Bernhard.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/POS_BruteforcingBot.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/POS_Easterjack.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/POS_FastPOS.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/POS_LogPOS.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/POS_MalumPOS.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/POS_Mozart.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_.CRYPTXXX.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_777.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Alpha.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Cerber.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Comodosec.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Crypren.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_CryptoNar.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Cryptolocker.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_DMALocker.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_DoublePulsar_Petya.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Erebus.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_GPGQwerty.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_GoldenEye.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Locky.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Maze.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_PetrWrap.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Petya.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Petya_MS17_010.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Pico.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Satana.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Shiva.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Sigma.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Snake.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_TeslaCrypt.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_Tox.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_acroware.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_jeff_dev.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_locdoor.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_screenlocker_5h311_1nj3c706.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_shrug2.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RANSOM_termite.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Adwind.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Adzok.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Asyncrat.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_BlackShades.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Bolonyokte.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Bozok.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Cerberus.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Crimson.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_CyberGate.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_FlyingKitten.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Gh0st.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Gholee.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Glass.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Havex.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Indetectables.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Meterpreter_Reverse_Tcp.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Nanocore.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_NetwiredRC.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Orcus.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_PlugX.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_PoetRATDoc.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_PoetRATPython.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_PoisonIvy.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Ratdecoders.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Sakula.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_ShadowTech.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Shim.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_Terminator.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_ZoxPNG.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_jRAT.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_xRAT.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/RAT_xRAT20.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_Chinese_Hacktools.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_Dubrute.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_Gen_powerkatz.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_PassTheHash.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_Pwdump.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_Redteam_Tools_by_GUID.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_Redteam_Tools_by_Name.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_Solarwinds_credential_stealer.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_Wineggdrop.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/malware/TOOLKIT_exe2hex_payload.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2010-0805.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2010-0887.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2010-1297.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2012-0158.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2013-0074.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2013-0422.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2015-1701.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2015-2426.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2015-2545.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2015-5119.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2016-5195.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2017-11882.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2018-20250.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/cve_rules/CVE-2018-4878.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/email/extortion_email.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/email/Email_generic_phishing.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/email/EMAIL_Cryptowall.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/email/Email_fake_it_maintenance_bulletin.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/email/email_Ukraine_BE_powerattack.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/email/scam.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/webshells/WShell_ASPXSpy.yar
+DatabaseCustomURL https://raw.githubusercontent.com/Yara-Rules/rules/master/webshells/WShell_Drupalgeddon2_icos.yar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
